@@ -152,17 +152,20 @@ export default function App() {
 
   const normalizedQuery = searchQuery.trim().toLowerCase()
   const hasActiveFilter = statusFilter !== 'all' || normalizedQuery !== ''
-  const filteredRows = auditResult
-    ? auditResult.rows.filter((row) => {
-        if (statusFilter !== 'all' && row.status !== statusFilter) {
-          return false
-        }
-        if (normalizedQuery && !row.key.toLowerCase().includes(normalizedQuery)) {
-          return false
-        }
-        return true
-      })
-    : []
+  const filteredRows = useMemo(() => {
+    if (!auditResult) {
+      return []
+    }
+    return auditResult.rows.filter((row) => {
+      if (statusFilter !== 'all' && row.status !== statusFilter) {
+        return false
+      }
+      if (normalizedQuery && !row.key.toLowerCase().includes(normalizedQuery)) {
+        return false
+      }
+      return true
+    })
+  }, [auditResult, statusFilter, normalizedQuery])
 
   return (
     <div className="flex min-h-screen flex-col bg-bg text-text">

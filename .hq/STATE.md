@@ -66,6 +66,7 @@ MVP complete 2026-11-14: all 8 PRD requirements met. Clean-install build, lint a
 | 005 | Export menu, footer, favicon, head tags, robots.txt | agy, gemini-4-hydrogen-high | merged | done | 1 | 2.2 min. Checked: both downloads, no values, 375px, Escape closes menu |
 | R01 | Code review of frontend files | opencode, deepseek-v4.1-flash max | main | done | 1 | 16 min (hit the limit after writing its report). 10 findings |
 | 006 | Fix review findings 1-5 and 7-10 | agy, gemini-4-hydrogen-high | merged | done | 1 | 5.1 min. Worker self-checked with agent-browser. Planner checked each fix in a headless browser, plus desktop and phone screenshots |
+| 007 | Paged matrix for large audits, detail text only when expanded, duplicate badge centered | agy, gemini-4-hydrogen-high | merged | done | 1 | 6.5 min. 40,000-variable audit: 28 s freeze before, 0.3 s after. Badge measured centered |
 
 ## Parked (waiting on the user)
 
@@ -83,7 +84,7 @@ R01 (2026-11-14): OpenCode reviewed `src/App.tsx` and `src/components/*`. Report
 | 3 | Paste form loses keyboard focus on open and close | Not yet confirmed | Fixed in 006, verified in browser |
 | 4 | Export menu loses focus on Tab | Not yet confirmed | Fixed in 006, verified in browser |
 | 5 | Two same-named files in one drop collapse silently | Follows from the code in #1 | Fixed in 006, verified in browser |
-| 6 | Very large files (hundreds of thousands of rows) can freeze the tab | Plausible, not tested | Parked: needs a product decision on a row cap; unlikely with real .env files |
+| 6 | Very large files (hundreds of thousands of rows) can freeze the tab | Measured: 28 s freeze at 40,000 variables | Fixed in 007: table shows 300 rows at a time with Show more; 0.3 s |
 | 7 | Per-file counts are bare colored numbers with low-contrast zeros | Not yet confirmed | Fixed in 006, verified in browser |
 | 8 | Row detail says "present with a value in all files" when the reference value is empty | Not yet confirmed | Fixed in 006, verified in browser |
 | 9 | Report time is stale after removing a file or switching reference | Confirmed in code | Fixed in 006, verified in browser |
