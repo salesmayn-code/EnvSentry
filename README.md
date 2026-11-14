@@ -1,5 +1,7 @@
 # EnvSentry
 
+**Live:** https://salesmayn-code.github.io/EnvSentry/
+
 Compare `.env` files across environments before you deploy. EnvSentry checks every file against a reference (usually `.env.example`) and reports:
 
 - **Critical:** variables missing from an environment, and variables declared with an empty value.

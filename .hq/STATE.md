@@ -11,7 +11,7 @@ Size: small (run straight through)
 |---|---|---|
 | Stack | Vite + React + TypeScript + Tailwind, fully client-side | One interactive screen; files are parsed in the browser and never uploaded, which keeps the PRD's privacy promise |
 | Free stack | Not needed | Static output; any free static host works. Decide at deploy time |
-| Hosting | Undecided | Ask before deploying |
+| Hosting | GitHub Pages via Actions (deploy.yml), base /EnvSentry/ | No new account; free; 100 GB/month soft limit |
 | Planner model | Claude Opus 5.5, medium or high effort | User's choice; not Fable 5.2 |
 | Frontend worker model | `agy`, `gemini-4-hydrogen-high` | Confirmed by user |
 | Backend worker model | `opencode`, `opencode-go/deepseek-v4.1-flash`, effort `max` | Confirmed by user; used for the parsing and comparison logic |
@@ -68,7 +68,7 @@ MVP complete 2026-11-14: all 8 PRD requirements met. Clean-install build, lint a
 ## Parked (waiting on the user)
 
 - none for GitHub: pushed 2026-11-14 to https://github.com/salesmayn-code/EnvSentry (public).
-- Deploy: host not chosen yet.
+- none for deploy.
 
 ## Model changes and escalations
 
@@ -76,4 +76,4 @@ MVP complete 2026-11-14: all 8 PRD requirements met. Clean-install build, lint a
 
 ## Deploy record
 
-- none
+- 2026-11-14: https://salesmayn-code.github.io/EnvSentry/ on GitHub Pages. Every push to main redeploys. Rollback: revert the commit on main and push, or re-run an earlier successful run of the Deploy to GitHub Pages workflow.
