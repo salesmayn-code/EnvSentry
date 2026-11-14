@@ -41,7 +41,7 @@ Direction: the user's reference screenshot (dark cross-environment secrets matri
 - Info: a key not in the reference (extra); a key declared more than once in one file (duplicate).
 - Empty values in the reference file are not flagged, since `.env.example` files are often blank on purpose.
 
-Sample page approved: no
+Sample page approved: yes (2026-11-14)
 
 ## Plan
 
@@ -62,7 +62,7 @@ Scaffold (Vite 8, React 19, TypeScript, Tailwind 4, Oxlint) done by the planner 
 
 ## Parked (waiting on the user)
 
-- Sample screen approval (task 001). Tasks 003–005 wait on it.
+- none
 
 ## Model changes and escalations
 
