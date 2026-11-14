@@ -64,12 +64,14 @@ export function CellMark({
 
   if (cell.lines.length > 1) {
     return (
-      <span
-        className="inline-flex items-center justify-center rounded bg-info/15 px-1.5 py-0.5 font-mono text-[11px] font-semibold leading-none text-info tabular-nums"
-        aria-label={`Declared ${cell.lines.length} times in ${fileName} (lines ${cell.lines.join(', ')})`}
-        title={`Declared ${cell.lines.length} times (lines ${cell.lines.join(', ')})`}
-      >
-        ×{cell.lines.length}
+      <span className="flex items-center justify-center">
+        <span
+          className="inline-flex items-center justify-center rounded bg-info/15 px-1.5 py-0.5 font-mono text-[11px] font-semibold leading-none text-info tabular-nums"
+          aria-label={`Declared ${cell.lines.length} times in ${fileName} (lines ${cell.lines.join(', ')})`}
+          title={`Declared ${cell.lines.length} times (lines ${cell.lines.join(', ')})`}
+        >
+          ×{cell.lines.length}
+        </span>
       </span>
     )
   }
