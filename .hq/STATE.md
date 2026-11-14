@@ -57,10 +57,12 @@ Scaffold (Vite 8, React 19, TypeScript, Tailwind 4, Oxlint) done by the planner 
 
 | ID | Task | Worker | Branch | Status | Attempts | Notes |
 |---|---|---|---|---|---|---|
+| 001 | Sample audit screen from static data | agy, gemini-4-hydrogen-high | merged | done | 1 | 3.6 min. Checked in browser at desktop and 375px. Follow-up for 003: reference-file empty values show an amber mark; make it muted since they are not flagged |
+| 002 | Parser and audit logic | opencode, deepseek-v4.1-flash max | merged | done | 1 | 3.4 min. Planner checks passed: brief case, PRD scenario, edge cases, no values in output |
 
 ## Parked (waiting on the user)
 
-- Session model: the user wants the planner on Opus 5.5; the session that ran kickoff was on Fable 5.2. Switch in the model menu before continuing.
+- Sample screen approval (task 001). Tasks 003–005 wait on it.
 
 ## Model changes and escalations
 
