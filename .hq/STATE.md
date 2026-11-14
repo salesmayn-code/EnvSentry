@@ -1,0 +1,71 @@
+# Project State: EnvSentry
+
+Path: `D:\Workspace\projects\EnvSentry`
+Started: 2026-11-13
+Workflow: web-app-build
+Size: small (run straight through)
+
+## Kickoff decisions
+
+| Topic | Decision | Why |
+|---|---|---|
+| Stack | Vite + React + TypeScript + Tailwind, fully client-side | One interactive screen; files are parsed in the browser and never uploaded, which keeps the PRD's privacy promise |
+| Free stack | Not needed | Static output; any free static host works. Decide at deploy time |
+| Hosting | Undecided | Ask before deploying |
+| Planner model | Claude Opus 5.5, medium or high effort | User's choice; not Fable 5.2 |
+| Frontend worker model | `agy`, `gemini-4-hydrogen-high` | Confirmed by user |
+| Backend worker model | `opencode`, `opencode-go/deepseek-v4.1-flash`, effort `max` | Confirmed by user; used for the parsing and comparison logic |
+| Design source | User's reference screenshot (dark cross-environment secrets dashboard) plus planner brief | See Design brief |
+
+## Goal
+
+A browser tool that compares several `.env` files against a chosen reference file and reports missing, extra, empty and duplicate variables, without ever displaying or storing values. Full requirements: `docs/PRD.md`.
+
+## Design brief
+
+Direction: the user's reference screenshot (dark cross-environment secrets matrix). Used as a direction only; no copying of that product's branding or screens.
+
+- **Audience and goal:** developers before a deploy. One action: drop files, see what is wrong, fix, re-run, export.
+- **Tone:** precise, calm, technical.
+- **Color (dark only):** background `#0b0d10`, surface `#12151a`, raised surface `#181c22`, border `#252a33`, text `#e6e8eb`, muted text `#8b93a1`, accent `#2dd4a3` (actions, reference marker, focus ring). Critical `#f05252` with row tint `rgba(240,82,82,0.08)`. Info `#f5a524` with row tint `rgba(245,165,36,0.07)`. Present `#3fb950`.
+- **Type:** UI in the system sans stack, variable names and line numbers in the system monospace stack (`ui-monospace, SFMono-Regular, Menlo, Consolas, monospace`). No web fonts, so the app makes no third-party requests. Sizes: page title 20px/600, section title 15px/600, body 14px, table 13px, small 12px.
+- **Spacing:** 4, 8, 12, 16, 24, 32, 48.
+- **Layout:** full width up to 1440px. Top bar; then left panel 300px (files) and main area (summary, filters, matrix). Under 900px the files panel stacks above the main area and the matrix scrolls sideways inside its own container (the page never scrolls sideways).
+- **Components:** buttons 32px high, 6px radius; primary is accent text on a 12% accent background with an accent border; secondary is text on raised surface with a border. Focus ring 2px accent. Table rows 36px, header row uppercase 11px muted.
+- **Status marks per cell:** present = green check; missing = red cross; empty = amber hollow circle with "empty" on hover; duplicate = amber "×2" badge; extra = amber plus; not applicable (extra key, file that does not declare it) = muted dash. Each mark has an accessible label.
+- **Values are never shown,** only whether one is present.
+
+### Severity rules (planner decision, tell the user)
+
+- Critical: a reference key missing from a file; a key declared with an empty value in a non-reference file.
+- Info: a key not in the reference (extra); a key declared more than once in one file (duplicate).
+- Empty values in the reference file are not flagged, since `.env.example` files are often blank on purpose.
+
+Sample page approved: no
+
+## Plan
+
+1. **001 sample screen** (Antigravity): the full audit screen with static sample data, for design approval.
+2. **002 parser and audit logic** (OpenCode): `src/lib/parse.ts`, `src/lib/audit.ts` against `src/lib/types.ts`.
+3. **003 wire up** (Antigravity): real file input (drop, pick, paste), reference selection, re-run, live results.
+4. **004 export** (OpenCode): sanitized Markdown and JSON report builders; (Antigravity) export buttons.
+5. **005 finish:** SEO basics, empty and error states, final check.
+
+Scaffold (Vite 8, React 19, TypeScript, Tailwind 4, Oxlint) done by the planner on main.
+
+## Tasks
+
+| ID | Task | Worker | Branch | Status | Attempts | Notes |
+|---|---|---|---|---|---|---|
+
+## Parked (waiting on the user)
+
+- Session model: the user wants the planner on Opus 5.5; the session that ran kickoff was on Fable 5.2. Switch in the model menu before continuing.
+
+## Model changes and escalations
+
+- none
+
+## Deploy record
+
+- none
