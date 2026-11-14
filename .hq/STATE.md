@@ -53,16 +53,22 @@ Sample page approved: yes (2026-11-14)
 
 Scaffold (Vite 8, React 19, TypeScript, Tailwind 4, Oxlint) done by the planner on main.
 
+MVP complete 2026-11-14: all 8 PRD requirements met. Clean-install build, lint and npm audit pass.
+
 ## Tasks
 
 | ID | Task | Worker | Branch | Status | Attempts | Notes |
 |---|---|---|---|---|---|---|
 | 001 | Sample audit screen from static data | agy, gemini-4-hydrogen-high | merged | done | 1 | 3.6 min. Checked in browser at desktop and 375px. Follow-up for 003: reference-file empty values show an amber mark; make it muted since they are not flagged |
 | 002 | Parser and audit logic | opencode, deepseek-v4.1-flash max | merged | done | 1 | 3.4 min. Planner checks passed: brief case, PRD scenario, edge cases, no values in output |
+| 003 | Real file input, paste, reference, re-run | agy, gemini-4-hydrogen-high | merged | done | 1 | 3.5 min. Browser-checked: sample files, paste replace, remove reference, drop, 1 MB limit |
+| 004 | Sanitized Markdown and JSON report builders | opencode, deepseek-v4.1-flash max | merged | done | 1 | 3.3 min. Checked: all sections, pipe escaping, no values or ids |
+| 005 | Export menu, footer, favicon, head tags, robots.txt | agy, gemini-4-hydrogen-high | merged | done | 1 | 2.2 min. Checked: both downloads, no values, 375px, Escape closes menu |
 
 ## Parked (waiting on the user)
 
-- none
+- Push to GitHub: needs the user's yes and a repository name and visibility.
+- Deploy: host not chosen yet.
 
 ## Model changes and escalations
 
