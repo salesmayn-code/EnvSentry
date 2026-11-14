@@ -70,6 +70,23 @@ MVP complete 2026-11-14: all 8 PRD requirements met. Clean-install build, lint a
 - none for GitHub: pushed 2026-11-14 to https://github.com/salesmayn-code/EnvSentry (public).
 - none for deploy.
 
+## Review findings
+
+R01 (2026-11-14): OpenCode reviewed `src/App.tsx` and `src/components/*`. Report: `.hq/reports/R01-review-frontend.md`. No fixes applied yet; verdicts are the planner's proposal, awaiting the user.
+
+| # | Finding | Planner check | Proposed verdict |
+|---|---|---|---|
+| 1 | `handleAddFiles` merges from a stale state snapshot; overlapping adds can drop files | Confirmed in code | Fix |
+| 2 | Dropping a file outside the drop zone makes the browser open it and lose all loaded files | Confirmed: no window-level drop handler | Fix (highest impact) |
+| 3 | Paste form loses keyboard focus on open and close | Not yet confirmed | Fix |
+| 4 | Export menu loses focus on Tab | Not yet confirmed | Fix |
+| 5 | Two same-named files in one drop collapse silently | Follows from the code in #1 | Fix: show a message |
+| 6 | Very large files (hundreds of thousands of rows) can freeze the tab | Plausible, not tested | Park or cap rows |
+| 7 | Per-file counts are bare colored numbers with low-contrast zeros | Not yet confirmed | Fix |
+| 8 | Row detail says "present with a value in all files" when the reference value is empty | Not yet confirmed | Fix |
+| 9 | Report time is stale after removing a file or switching reference | Confirmed in code | Fix |
+| 10 | Empty result says "No variables match this filter" when no filter is active | Not yet confirmed | Fix |
+
 ## Model changes and escalations
 
 - none
