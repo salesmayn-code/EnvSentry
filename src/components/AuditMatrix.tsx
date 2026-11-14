@@ -192,6 +192,7 @@ export function AuditMatrix({ rows, files, referenceId }: AuditMatrixProps) {
                         <CellMark
                           cell={cell}
                           inReference={row.inReference}
+                          isReferenceFile={file.id === referenceId}
                           fileName={file.name}
                         />
                       </td>

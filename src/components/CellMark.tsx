@@ -3,10 +3,16 @@ import type { Cell } from '../lib/types'
 interface CellMarkProps {
   cell: Cell
   inReference: boolean
+  isReferenceFile: boolean
   fileName: string
 }
 
-export function CellMark({ cell, inReference, fileName }: CellMarkProps) {
+export function CellMark({
+  cell,
+  inReference,
+  isReferenceFile,
+  fileName,
+}: CellMarkProps) {
   if (cell.lines.length === 0) {
     if (inReference) {
       return (
@@ -69,6 +75,20 @@ export function CellMark({ cell, inReference, fileName }: CellMarkProps) {
   }
 
   if (cell.empty) {
+    if (isReferenceFile) {
+      return (
+        <span
+          className="inline-flex items-center justify-center text-muted"
+          title="Empty in reference (not flagged)"
+          aria-label="Empty in reference (not flagged)"
+        >
+          <svg viewBox="0 0 16 16" fill="none" className="size-3.5" aria-hidden="true">
+            <circle cx="8" cy="8" r="4.75" stroke="currentColor" strokeWidth="1.75" />
+          </svg>
+        </span>
+      )
+    }
+
     return (
       <span
         className="inline-flex items-center justify-center text-info"
