@@ -64,6 +64,8 @@ MVP complete 2026-11-14: all 8 PRD requirements met. Clean-install build, lint a
 | 003 | Real file input, paste, reference, re-run | agy, gemini-4-hydrogen-high | merged | done | 1 | 3.5 min. Browser-checked: sample files, paste replace, remove reference, drop, 1 MB limit |
 | 004 | Sanitized Markdown and JSON report builders | opencode, deepseek-v4.1-flash max | merged | done | 1 | 3.3 min. Checked: all sections, pipe escaping, no values or ids |
 | 005 | Export menu, footer, favicon, head tags, robots.txt | agy, gemini-4-hydrogen-high | merged | done | 1 | 2.2 min. Checked: both downloads, no values, 375px, Escape closes menu |
+| R01 | Code review of frontend files | opencode, deepseek-v4.1-flash max | main | done | 1 | 16 min (hit the limit after writing its report). 10 findings |
+| 006 | Fixed in 006, verified | agy, gemini-4-hydrogen-high | merged | done | 1 | 5.1 min. Worker self-checked with agent-browser. Planner checked each fix in a headless browser, plus desktop and phone screenshots |
 
 ## Parked (waiting on the user)
 
@@ -72,16 +74,16 @@ MVP complete 2026-11-14: all 8 PRD requirements met. Clean-install build, lint a
 
 ## Review findings
 
-R01 (2026-11-14): OpenCode reviewed `src/App.tsx` and `src/components/*`. Report: `.hq/reports/R01-review-frontend.md`. No fixes applied yet; verdicts are the planner's proposal, awaiting the user.
+R01 (2026-11-14): OpenCode reviewed `src/App.tsx` and `src/components/*`. Report: `.hq/reports/R01-review-frontend.md`. User approved fixing on 2026-11-14. Task 006 fixed all except #6.
 
-| # | Finding | Planner check | Proposed verdict |
+| # | Finding | Planner check | Verdict |
 |---|---|---|---|
 | 1 | `handleAddFiles` merges from a stale state snapshot; overlapping adds can drop files | Confirmed in code | Fix |
 | 2 | Dropping a file outside the drop zone makes the browser open it and lose all loaded files | Confirmed: no window-level drop handler | Fix (highest impact) |
 | 3 | Paste form loses keyboard focus on open and close | Not yet confirmed | Fix |
 | 4 | Export menu loses focus on Tab | Not yet confirmed | Fix |
 | 5 | Two same-named files in one drop collapse silently | Follows from the code in #1 | Fix: show a message |
-| 6 | Very large files (hundreds of thousands of rows) can freeze the tab | Plausible, not tested | Park or cap rows |
+| 6 | Very large files (hundreds of thousands of rows) can freeze the tab | Plausible, not tested | Parked: needs a product decision on a row cap; unlikely with real .env files |
 | 7 | Per-file counts are bare colored numbers with low-contrast zeros | Not yet confirmed | Fix |
 | 8 | Row detail says "present with a value in all files" when the reference value is empty | Not yet confirmed | Fix |
 | 9 | Report time is stale after removing a file or switching reference | Confirmed in code | Fix |
