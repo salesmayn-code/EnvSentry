@@ -67,7 +67,7 @@ MVP complete 2026-11-14: all 8 PRD requirements met. Clean-install build, lint a
 
 ## Parked (waiting on the user)
 
-- Push to GitHub: needs the user's yes and a repository name and visibility.
+- none for GitHub: pushed 2026-11-14 to https://github.com/salesmayn-code/EnvSentry (public).
 - Deploy: host not chosen yet.
 
 ## Model changes and escalations
