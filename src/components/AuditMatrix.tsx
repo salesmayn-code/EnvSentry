@@ -6,14 +6,20 @@ interface AuditMatrixProps {
   rows: AuditRow[]
   files: FileSummary[]
   referenceId: string
+  hasActiveFilter: boolean
 }
 
 function formatRowFindings(
   findings: Finding[],
   fileNamesById: Record<string, string>,
+  referenceCellEmpty: boolean,
 ): string[] {
   if (findings.length === 0) {
-    return ['No issues — present with a value in all files.']
+    const lines = ['No issues — declared in every file.']
+    if (referenceCellEmpty) {
+      lines.push('The reference value is empty, which is not flagged.')
+    }
+    return lines
   }
 
   const lines: string[] = []
@@ -64,13 +70,20 @@ function getStickyBackground(status: AuditRow['status']): string {
   return 'var(--color-surface)'
 }
 
-export function AuditMatrix({ rows, files, referenceId }: AuditMatrixProps) {
+export function AuditMatrix({
+  rows,
+  files,
+  referenceId,
+  hasActiveFilter,
+}: AuditMatrixProps) {
   const [expandedKeys, setExpandedKeys] = useState<Record<string, boolean>>({})
 
   if (rows.length === 0) {
     return (
       <div className="rounded-[6px] border border-border bg-surface px-4 py-8 text-center text-[14px] text-muted">
-        No variables match this filter.
+        {hasActiveFilter
+          ? 'No variables match this filter.'
+          : 'No variables found in these files.'}
       </div>
     )
   }
@@ -126,7 +139,11 @@ export function AuditMatrix({ rows, files, referenceId }: AuditMatrixProps) {
               row.inReference && refLines.length > 0
                 ? `L${refLines[0]}`
                 : 'extra'
-            const detailLines = formatRowFindings(row.findings, fileNamesById)
+            const detailLines = formatRowFindings(
+              row.findings,
+              fileNamesById,
+              Boolean(row.cells[referenceId]?.empty),
+            )
 
             return (
               <Fragment key={row.key}>

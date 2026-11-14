@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { AuditMatrix } from './components/AuditMatrix'
 import { FilesPanel, type IncomingEnvFile } from './components/FilesPanel'
 import { FilterBar, type StatusFilter } from './components/FilterBar'
@@ -9,6 +9,12 @@ import { parseEnv } from './lib/parse'
 import type { AuditResult, EnvFile, FileSummary } from './lib/types'
 import { sampleFiles } from './sample/sampleFiles'
 
+interface AuditState {
+  files: EnvFile[]
+  referenceId: string | null
+  runAt: Date
+}
+
 function pickReferenceId(files: EnvFile[]): string | null {
   if (files.length === 0) {
     return null
@@ -18,11 +24,15 @@ function pickReferenceId(files: EnvFile[]): string | null {
 }
 
 export default function App() {
-  const [files, setFiles] = useState<EnvFile[]>([])
-  const [referenceId, setReferenceId] = useState<string | null>(null)
-  const [runAt, setRunAt] = useState<Date>(() => new Date())
+  const [auditState, setAuditState] = useState<AuditState>(() => ({
+    files: [],
+    referenceId: null,
+    runAt: new Date(),
+  }))
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
   const [searchQuery, setSearchQuery] = useState('')
+
+  const { files, referenceId, runAt } = auditState
 
   const hasValidReference =
     referenceId !== null && files.some((file) => file.id === referenceId)
@@ -53,60 +63,87 @@ export default function App() {
     })
   }, [auditResult, files, referenceId])
 
-  function handleAddFiles(incoming: IncomingEnvFile[]) {
+  const handleAddFiles = useCallback((incoming: IncomingEnvFile[]) => {
     if (incoming.length === 0) {
       return
     }
 
-    const nextFiles = files.map((file) => ({ ...file }))
-    for (const item of incoming) {
-      const existingIndex = nextFiles.findIndex((file) => file.name === item.name)
-      if (existingIndex !== -1) {
-        nextFiles[existingIndex] = {
-          ...nextFiles[existingIndex],
-          text: item.text,
+    setAuditState((prev) => {
+      const nextFiles = prev.files.map((file) => ({ ...file }))
+      for (const item of incoming) {
+        const existingIndex = nextFiles.findIndex((file) => file.name === item.name)
+        if (existingIndex !== -1) {
+          nextFiles[existingIndex] = {
+            ...nextFiles[existingIndex],
+            text: item.text,
+          }
+        } else {
+          nextFiles.push({
+            id: crypto.randomUUID(),
+            name: item.name,
+            text: item.text,
+          })
         }
-      } else {
-        nextFiles.push({
-          id: crypto.randomUUID(),
-          name: item.name,
-          text: item.text,
-        })
       }
-    }
 
-    const refStillValid =
-      referenceId !== null && nextFiles.some((file) => file.id === referenceId)
-    const nextReferenceId = refStillValid
-      ? referenceId
-      : pickReferenceId(nextFiles)
+      const refStillValid =
+        prev.referenceId !== null &&
+        nextFiles.some((file) => file.id === prev.referenceId)
+      const nextReferenceId = refStillValid
+        ? prev.referenceId
+        : pickReferenceId(nextFiles)
 
-    setFiles(nextFiles)
-    setReferenceId(nextReferenceId)
-    setRunAt(new Date())
-  }
+      return {
+        files: nextFiles,
+        referenceId: nextReferenceId,
+        runAt: new Date(),
+      }
+    })
+  }, [])
 
   function handleRemoveFile(id: string) {
-    const nextFiles = files.filter((file) => file.id !== id)
-    const nextReferenceId =
-      referenceId === id || !nextFiles.some((file) => file.id === referenceId)
-        ? pickReferenceId(nextFiles)
-        : referenceId
+    setAuditState((prev) => {
+      const nextFiles = prev.files.filter((file) => file.id !== id)
+      const nextReferenceId =
+        prev.referenceId === id ||
+        !nextFiles.some((file) => file.id === prev.referenceId)
+          ? pickReferenceId(nextFiles)
+          : prev.referenceId
 
-    setFiles(nextFiles)
-    setReferenceId(nextReferenceId)
+      return {
+        files: nextFiles,
+        referenceId: nextReferenceId,
+        runAt: new Date(),
+      }
+    })
   }
 
   function handleSelectReference(id: string) {
-    if (files.some((file) => file.id === id)) {
-      setReferenceId(id)
-    }
+    setAuditState((prev) => {
+      if (!prev.files.some((file) => file.id === id) || prev.referenceId === id) {
+        return prev
+      }
+      return {
+        ...prev,
+        referenceId: id,
+        runAt: new Date(),
+      }
+    })
   }
 
   function handleRerun() {
-    if (files.length >= 2 && hasValidReference) {
-      setRunAt(new Date())
-    }
+    setAuditState((prev) => {
+      const validRef =
+        prev.referenceId !== null &&
+        prev.files.some((file) => file.id === prev.referenceId)
+      if (prev.files.length < 2 || !validRef) {
+        return prev
+      }
+      return {
+        ...prev,
+        runAt: new Date(),
+      }
+    })
   }
 
   function handleLoadSampleFiles() {
@@ -114,6 +151,7 @@ export default function App() {
   }
 
   const normalizedQuery = searchQuery.trim().toLowerCase()
+  const hasActiveFilter = statusFilter !== 'all' || normalizedQuery !== ''
   const filteredRows = auditResult
     ? auditResult.rows.filter((row) => {
         if (statusFilter !== 'all' && row.status !== statusFilter) {
@@ -168,6 +206,7 @@ export default function App() {
                   rows={filteredRows}
                   files={auditResult.files}
                   referenceId={auditResult.referenceId}
+                  hasActiveFilter={hasActiveFilter}
                 />
               </>
             ) : files.length === 0 ? (

@@ -57,6 +57,8 @@ export function SummaryStrip({
       return
     }
 
+    itemRefs.current[0]?.focus()
+
     function handlePointerDown(event: PointerEvent) {
       if (
         menuContainerRef.current &&
@@ -95,9 +97,6 @@ export function SummaryStrip({
     if (event.key === 'ArrowDown' && auditResult) {
       event.preventDefault()
       setIsExportOpen(true)
-      requestAnimationFrame(() => {
-        itemRefs.current[0]?.focus()
-      })
     }
   }
 
@@ -129,6 +128,7 @@ export function SummaryStrip({
       event.preventDefault()
       items[items.length - 1].focus()
     } else if (event.key === 'Tab') {
+      triggerRef.current?.focus()
       setIsExportOpen(false)
     }
   }
@@ -220,6 +220,7 @@ export function SummaryStrip({
                   }}
                   type="button"
                   role="menuitem"
+                  tabIndex={-1}
                   onClick={() => handleExportChoice('md')}
                   className="flex w-full cursor-pointer items-center rounded-[4px] px-2.5 py-1.5 text-left text-[13px] text-text transition-colors hover:bg-surface focus-visible:bg-surface"
                 >
@@ -231,6 +232,7 @@ export function SummaryStrip({
                   }}
                   type="button"
                   role="menuitem"
+                  tabIndex={-1}
                   onClick={() => handleExportChoice('json')}
                   className="flex w-full cursor-pointer items-center rounded-[4px] px-2.5 py-1.5 text-left text-[13px] text-text transition-colors hover:bg-surface focus-visible:bg-surface"
                 >

@@ -1,4 +1,4 @@
-import { useRef, useState, type ChangeEvent, type DragEvent, type FormEvent } from 'react'
+import { useCallback, useEffect, useRef, useState, type ChangeEvent, type FormEvent } from 'react'
 import type { FileSummary } from '../lib/types'
 
 const MAX_FILE_SIZE_BYTES = 1024 * 1024
@@ -22,6 +22,14 @@ function formatInvalidLines(lines: number[]): string {
   return `${count} ${unit} (${lines.join(', ')})`
 }
 
+function eventHasFiles(event: DragEvent): boolean {
+  const dt = event.dataTransfer
+  if (!dt) {
+    return false
+  }
+  return dt.types.includes('Files') || dt.files.length > 0
+}
+
 export function FilesPanel({
   files,
   onAddFiles,
@@ -30,6 +38,9 @@ export function FilesPanel({
 }: FilesPanelProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const dragDepthRef = useRef(0)
+  const pasteButtonRef = useRef<HTMLButtonElement>(null)
+  const pasteNameInputRef = useRef<HTMLInputElement>(null)
+  const wasPasteOpenRef = useRef(false)
 
   const [isDragging, setIsDragging] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -37,69 +48,121 @@ export function FilesPanel({
   const [pasteName, setPasteName] = useState(DEFAULT_PASTED_NAME)
   const [pasteText, setPasteText] = useState('')
 
-  async function processFileList(fileList: FileList | null) {
-    if (!fileList || fileList.length === 0) {
-      return
-    }
-
-    setErrorMessage(null)
-
-    const accepted: IncomingEnvFile[] = []
-    const errors: string[] = []
-
-    for (const file of Array.from(fileList)) {
-      if (file.size > MAX_FILE_SIZE_BYTES) {
-        errors.push(`"${file.name}" exceeds the 1 MB limit and was not added.`)
-        continue
+  const processFileList = useCallback(
+    async (fileList: FileList | null) => {
+      if (!fileList || fileList.length === 0) {
+        return
       }
 
-      try {
-        const text = await file.text()
-        accepted.push({ name: file.name, text })
-      } catch {
-        errors.push(`Could not read "${file.name}".`)
+      setErrorMessage(null)
+
+      const accepted: IncomingEnvFile[] = []
+      const errors: string[] = []
+
+      for (const file of Array.from(fileList)) {
+        if (file.size > MAX_FILE_SIZE_BYTES) {
+          errors.push(`"${file.name}" exceeds the 1 MB limit and was not added.`)
+          continue
+        }
+
+        try {
+          const text = await file.text()
+          accepted.push({ name: file.name, text })
+        } catch {
+          errors.push(`Could not read "${file.name}".`)
+        }
+      }
+
+      if (accepted.length > 0) {
+        const nameCounts = new Map<string, number>()
+        for (const item of accepted) {
+          nameCounts.set(item.name, (nameCounts.get(item.name) ?? 0) + 1)
+        }
+        for (const [name, count] of nameCounts) {
+          if (count >= 2) {
+            const countLabel = count === 2 ? 'Two' : String(count)
+            errors.push(
+              `${countLabel} files named "${name}" were added together; only the last one was kept. Add them separately with different names.`,
+            )
+          }
+        }
+        onAddFiles(accepted)
+      }
+
+      if (errors.length > 0) {
+        setErrorMessage(errors.join(' '))
+      }
+    },
+    [onAddFiles],
+  )
+
+  useEffect(() => {
+    function handleWindowDragEnter(event: DragEvent) {
+      if (!eventHasFiles(event)) {
+        return
+      }
+      event.preventDefault()
+      dragDepthRef.current += 1
+      setIsDragging(true)
+    }
+
+    function handleWindowDragOver(event: DragEvent) {
+      if (!eventHasFiles(event)) {
+        return
+      }
+      event.preventDefault()
+      if (event.dataTransfer) {
+        event.dataTransfer.dropEffect = 'copy'
       }
     }
 
-    if (accepted.length > 0) {
-      onAddFiles(accepted)
+    function handleWindowDragLeave(event: DragEvent) {
+      if (!eventHasFiles(event)) {
+        return
+      }
+      event.preventDefault()
+      dragDepthRef.current = Math.max(0, dragDepthRef.current - 1)
+      if (dragDepthRef.current === 0) {
+        setIsDragging(false)
+      }
     }
 
-    if (errors.length > 0) {
-      setErrorMessage(errors.join(' '))
+    function handleWindowDrop(event: DragEvent) {
+      if (!eventHasFiles(event)) {
+        return
+      }
+      event.preventDefault()
+      dragDepthRef.current = 0
+      setIsDragging(false)
+      void processFileList(event.dataTransfer?.files ?? null)
     }
-  }
+
+    window.addEventListener('dragenter', handleWindowDragEnter)
+    window.addEventListener('dragover', handleWindowDragOver)
+    window.addEventListener('dragleave', handleWindowDragLeave)
+    window.addEventListener('drop', handleWindowDrop)
+    return () => {
+      window.removeEventListener('dragenter', handleWindowDragEnter)
+      window.removeEventListener('dragover', handleWindowDragOver)
+      window.removeEventListener('dragleave', handleWindowDragLeave)
+      window.removeEventListener('drop', handleWindowDrop)
+    }
+  }, [processFileList])
+
+  useEffect(() => {
+    if (isPasteOpen) {
+      wasPasteOpenRef.current = true
+      pasteNameInputRef.current?.focus()
+    } else if (wasPasteOpenRef.current) {
+      wasPasteOpenRef.current = false
+      pasteButtonRef.current?.focus()
+    }
+  }, [isPasteOpen])
 
   function handleFileInputChange(e: ChangeEvent<HTMLInputElement>) {
     const selected = e.target.files
     void processFileList(selected)
     e.target.value = ''
-  }
-
-  function handleDragEnter(e: DragEvent<HTMLDivElement>) {
-    e.preventDefault()
-    dragDepthRef.current += 1
-    setIsDragging(true)
-  }
-
-  function handleDragOver(e: DragEvent<HTMLDivElement>) {
-    e.preventDefault()
-    e.dataTransfer.dropEffect = 'copy'
-  }
-
-  function handleDragLeave(e: DragEvent<HTMLDivElement>) {
-    e.preventDefault()
-    dragDepthRef.current = Math.max(0, dragDepthRef.current - 1)
-    if (dragDepthRef.current === 0) {
-      setIsDragging(false)
-    }
-  }
-
-  function handleDrop(e: DragEvent<HTMLDivElement>) {
-    e.preventDefault()
-    dragDepthRef.current = 0
-    setIsDragging(false)
-    void processFileList(e.dataTransfer.files)
   }
 
   function handleOpenPaste() {
@@ -142,10 +205,6 @@ export function FilesPanel({
       </h2>
 
       <div
-        onDragEnter={handleDragEnter}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
         className={`flex flex-col items-center justify-center gap-3 rounded-[6px] border border-dashed px-4 py-6 text-center transition-colors ${
           isDragging
             ? 'border-accent bg-accent/8'
@@ -174,6 +233,7 @@ export function FilesPanel({
       {!isPasteOpen ? (
         <div className="-mt-1 flex justify-center">
           <button
+            ref={pasteButtonRef}
             type="button"
             onClick={handleOpenPaste}
             className="cursor-pointer text-[12px] text-muted underline-offset-4 transition-colors hover:text-text hover:underline"
@@ -194,6 +254,7 @@ export function FilesPanel({
               File name
             </label>
             <input
+              ref={pasteNameInputRef}
               id="paste-file-name"
               type="text"
               value={pasteName}
@@ -280,10 +341,13 @@ export function FilesPanel({
                     <span className="mt-0.5 flex items-center gap-2 text-[12px] text-muted">
                       <span className="tabular-nums">{file.keyCount} keys</span>
                       <span className="flex items-center gap-1.5 font-mono tabular-nums">
+                        <span className="sr-only">
+                          {file.critical} critical, {file.info} info
+                        </span>
                         <span
-                          className={file.critical > 0 ? 'text-critical' : 'text-muted/60'}
+                          className={file.critical > 0 ? 'text-critical' : 'text-muted'}
                           title={`${file.critical} critical`}
-                          aria-label={`${file.critical} critical`}
+                          aria-hidden="true"
                         >
                           {file.critical}
                         </span>
@@ -291,9 +355,9 @@ export function FilesPanel({
                           /
                         </span>
                         <span
-                          className={file.info > 0 ? 'text-info' : 'text-muted/60'}
+                          className={file.info > 0 ? 'text-info' : 'text-muted'}
                           title={`${file.info} info`}
-                          aria-label={`${file.info} info`}
+                          aria-hidden="true"
                         >
                           {file.info}
                         </span>
