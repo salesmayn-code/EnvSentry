@@ -3,9 +3,16 @@ import type { AuditResult } from '../lib/types'
 interface SummaryStripProps {
   totals: AuditResult['totals']
   fileCount: number
+  canRerun: boolean
+  onRerun: () => void
 }
 
-export function SummaryStrip({ totals, fileCount }: SummaryStripProps) {
+export function SummaryStrip({
+  totals,
+  fileCount,
+  canRerun,
+  onRerun,
+}: SummaryStripProps) {
   return (
     <section
       aria-label="Audit summary"
@@ -41,13 +48,18 @@ export function SummaryStrip({ totals, fileCount }: SummaryStripProps) {
       <div className="flex flex-wrap items-center gap-2">
         <button
           type="button"
-          className="h-8 cursor-pointer rounded-[6px] border border-accent bg-accent/12 px-3 text-[13px] font-medium text-accent transition-colors hover:bg-accent/20"
+          onClick={onRerun}
+          disabled={!canRerun}
+          title="Re-run with the current files. Drop an updated file with the same name to replace it."
+          className="h-8 cursor-pointer rounded-[6px] border border-accent bg-accent/12 px-3 text-[13px] font-medium text-accent transition-colors enabled:hover:bg-accent/20 disabled:cursor-not-allowed disabled:opacity-50"
         >
           Re-run audit
         </button>
         <button
           type="button"
-          className="h-8 cursor-pointer rounded-[6px] border border-border bg-raised px-3 text-[13px] font-medium text-text transition-colors hover:border-muted/60"
+          disabled
+          title="Export arrives in the next update"
+          className="h-8 cursor-not-allowed rounded-[6px] border border-border bg-raised px-3 text-[13px] font-medium text-muted opacity-50"
         >
           Export report
         </button>
