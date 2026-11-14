@@ -127,10 +127,10 @@ export default function App() {
     : []
 
   return (
-    <div className="min-h-screen bg-bg text-text">
+    <div className="flex min-h-screen flex-col bg-bg text-text">
       <TopBar />
 
-      <main className="mx-auto max-w-[1440px] px-4 py-6">
+      <main className="mx-auto w-full max-w-[1440px] flex-1 px-4 py-6">
         <div className="grid grid-cols-1 gap-6 min-[900px]:grid-cols-[300px_minmax(0,1fr)] min-[900px]:items-start">
           <FilesPanel
             files={fileSummaries}
@@ -150,6 +150,7 @@ export default function App() {
             {auditResult ? (
               <>
                 <SummaryStrip
+                  auditResult={auditResult}
                   totals={auditResult.totals}
                   fileCount={auditResult.files.length}
                   canRerun={files.length >= 2 && hasValidReference}
@@ -190,6 +191,14 @@ export default function App() {
           </section>
         </div>
       </main>
+
+      <footer className="border-t border-border bg-bg">
+        <div className="mx-auto max-w-[1440px] px-4 py-3">
+          <p className="text-[12px] text-muted">
+            EnvSentry runs entirely in your browser. Files are never uploaded or stored.
+          </p>
+        </div>
+      </footer>
     </div>
   )
 }
