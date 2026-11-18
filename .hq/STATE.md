@@ -97,3 +97,11 @@ R01 (2026-11-14): OpenCode reviewed `src/App.tsx` and `src/components/*`. Report
 ## Deploy record
 
 - 2026-11-14: https://salesmayn-code.github.io/EnvSentry/ on GitHub Pages. Every push to main redeploys. Rollback: revert the commit on main and push, or re-run an earlier successful run of the Deploy to GitHub Pages workflow.
+- 2026-11-18: SEO pass (workflow `marketing-seo.md`). Findings in `.hq/seo/findings-1.md`. Tasks s01 (agy, head tags + `public/og-image.png`) and s02 (OpenCode, JSON-LD + `public/sitemap.xml`) merged and deployed. Live audit 5 FAIL → 0 FAIL; Lighthouse 100 in all four categories before and after.
+
+## SEO
+
+- Audits: 2026-11-18 #1 5 FAIL, #2 0 FAIL (`node D:\Workspace\scripts\seo-audit.mjs https://salesmayn-code.github.io/EnvSentry/ --rendered`).
+- Parked (user): Search Console URL-prefix property for `https://salesmayn-code.github.io/EnvSentry/`, verify, submit `sitemap.xml`, request indexing.
+- Advice not acted on: title with the search phrase ("EnvSentry — Compare .env Files Across Environments"); a short "How it works / privacy" text section.
+
