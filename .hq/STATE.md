@@ -105,3 +105,7 @@ R01 (2026-11-14): OpenCode reviewed `src/App.tsx` and `src/components/*`. Report
 - Parked (user): Search Console URL-prefix property for `https://salesmayn-code.github.io/EnvSentry/`, verify, submit `sitemap.xml`, request indexing.
 - Advice not acted on: title with the search phrase ("EnvSentry — Compare .env Files Across Environments"); a short "How it works / privacy" text section.
 
+
+## Design (workflow 5)
+
+- 2026-11-18: d01 tokens page (`tokens.html`, `src/tokens/`, noindex, not linked) by agy gemini-4-hydrogen-high, 4.1 min, first try. Build, lint, detector (0 findings) pass; checked at 1440 and 375 wide. Tokens live in `src/index.css` `@theme`. Surface colors show "fail" contrast on bg by design (not text colors).
